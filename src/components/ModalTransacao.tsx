@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 interface Props {
   tipo: 'entrada' | 'saida';
+  salvando?: boolean;
   onConfirmar: (valor: number, motivo: string) => void;
   onCancelar: () => void;
 }
@@ -9,12 +10,14 @@ interface Props {
 const motivosEntrada = ['Guardei do salário', 'Economizei no mês', 'Recebi extra', 'Outro'];
 const motivosSaida = ['Emergência médica', 'Conserto urgente', 'Perda de renda', 'Outro'];
 
-export function ModalTransacao({ tipo, onConfirmar, onCancelar }: Props) {
+export function ModalTransacao({ tipo, salvando = false, onConfirmar, onCancelar }: Props) {
   const [valor, setValor] = useState('');
   const [motivo, setMotivo] = useState('');
 
   const motivos = tipo === 'entrada' ? motivosEntrada : motivosSaida;
-  const podeConfirmar = !!valor && parseFloat(valor) > 0 && !!motivo;
+  // O gravar agora é assíncrono: sem o `!salvando`, um duplo clique
+  // insere a mesma movimentação duas vezes.
+  const podeConfirmar = !!valor && parseFloat(valor) > 0 && !!motivo && !salvando;
 
   return (
     <div className="modal-overlay" onClick={onCancelar}>
@@ -48,13 +51,15 @@ export function ModalTransacao({ tipo, onConfirmar, onCancelar }: Props) {
         </div>
 
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={onCancelar}>Cancelar</button>
+          <button className="btn-secondary" onClick={onCancelar} disabled={salvando}>
+            Cancelar
+          </button>
           <button
             className="btn-primary"
             disabled={!podeConfirmar}
             onClick={() => onConfirmar(parseFloat(valor), motivo)}
           >
-            Confirmar
+            {salvando ? 'Salvando…' : 'Confirmar'}
           </button>
         </div>
       </div>

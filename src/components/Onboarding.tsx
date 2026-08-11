@@ -3,11 +3,12 @@ import type { Perfil } from '../types';
 
 interface Props {
   onConcluir: (perfil: Perfil) => void;
+  salvando?: boolean;
 }
 
 const passos = ['renda', 'gastos', 'perfil'] as const;
 
-export function Onboarding({ onConcluir }: Props) {
+export function Onboarding({ onConcluir, salvando = false }: Props) {
   const [passo, setPasso] = useState(0);
   const [renda, setRenda] = useState('');
   const [gastos, setGastos] = useState('');
@@ -27,6 +28,7 @@ export function Onboarding({ onConcluir }: Props) {
   }
 
   const podeContinuar =
+    salvando ? false :
     passo === 0 ? !!renda && parseFloat(renda) > 0 :
     passo === 1 ? !!gastos && parseFloat(gastos) > 0 :
     !!idade && parseInt(idade) > 0;
@@ -118,7 +120,11 @@ export function Onboarding({ onConcluir }: Props) {
           onClick={avancar}
           disabled={!podeContinuar}
         >
-          {passo < passos.length - 1 ? 'Continuar →' : 'Começar minha reserva 🚀'}
+          {salvando
+            ? 'Salvando…'
+            : passo < passos.length - 1
+              ? 'Continuar →'
+              : 'Começar minha reserva 🚀'}
         </button>
       </div>
     </div>
