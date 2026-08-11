@@ -59,7 +59,7 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
             <div className="input-wrapper">
               <span>R$</span>
               <input
-                type="number"
+                type="text"
                 min="0"
                 placeholder="2.500"
                 value={renda}

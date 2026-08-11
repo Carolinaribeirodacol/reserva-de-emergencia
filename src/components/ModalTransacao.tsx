@@ -28,7 +28,7 @@ export function ModalTransacao({ tipo, salvando = false, onConfirmar, onCancelar
         <div className="input-wrapper">
           <span>R$</span>
           <input
-            type="number"
+            type="text"
             min="0.01"
             step="0.01"
             placeholder="0,00"
