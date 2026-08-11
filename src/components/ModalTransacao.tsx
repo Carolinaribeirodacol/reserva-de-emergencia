@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatCurrency } from '../helpers/currency';
 
 interface Props {
   tipo: 'entrada' | 'saida';
@@ -32,7 +33,7 @@ export function ModalTransacao({ tipo, salvando = false, onConfirmar, onCancelar
             step="0.01"
             placeholder="0,00"
             value={valor}
-            onChange={e => setValor(e.target.value)}
+            onChange={e => setValor(formatCurrency(e.target.value))}
             autoFocus
           />
         </div>

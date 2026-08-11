@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Perfil } from '../types';
+import { currencyToNumber, formatCurrency } from '../helpers/currency';
 
 interface Props {
   onConcluir: (perfil: Perfil) => void;
@@ -19,19 +20,22 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
     if (passo < passos.length - 1) setPasso(p => p + 1);
     else {
       onConcluir({
-        renda: parseFloat(renda.replace(',', '.')),
-        gastos: parseFloat(gastos.replace(',', '.')),
+        renda: currencyToNumber(renda),
+        gastos: currencyToNumber(gastos),
         idade: parseInt(idade),
         objetivo,
       });
     }
   }
 
-  const podeContinuar =
-    salvando ? false :
-    passo === 0 ? !!renda && parseFloat(renda) > 0 :
-    passo === 1 ? !!gastos && parseFloat(gastos) > 0 :
-    !!idade && parseInt(idade) > 0;
+  const canProceed =
+    salvando
+      ? false
+      : passo === 0
+        ? !!renda && currencyToNumber(renda) > 0
+        : passo === 1
+          ? !!gastos && currencyToNumber(gastos) > 0
+          : !!idade && parseInt(idade) > 0;
 
   return (
     <div className="onboarding">
@@ -59,7 +63,7 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
                 min="0"
                 placeholder="2.500"
                 value={renda}
-                onChange={e => setRenda(e.target.value)}
+                onChange={e => setRenda(formatCurrency(e.target.value))}
                 autoFocus
               />
             </div>
@@ -118,7 +122,7 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
         <button
           className="btn-primary"
           onClick={avancar}
-          disabled={!podeContinuar}
+          disabled={!canProceed}
         >
           {salvando
             ? 'Salvando…'

@@ -11,7 +11,15 @@ export function ThemeSwitch({ tema, onAlternar }: Props) {
 
   return (
     <Button onClick={onAlternar} title={`Mudar para o tema ${vaiPara}`}>
-      {tema === 'dark' ? '☀️' : '🌙'}
+      {
+        tema === 'dark' ? 
+          <span className="material-symbols-outlined">
+            light_mode
+          </span> : 
+          <span className="material-symbols-outlined">
+            dark_mode
+          </span>
+      }
     </Button>
   );
 }

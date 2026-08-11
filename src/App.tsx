@@ -24,24 +24,23 @@ function App() {
     return <Auth tema={tema} onAlternarTema={alternarTema} />;
   }
 
-  // A key garante que todo o estado seja recriado ao trocar de usuário.
   return (
     <AppLogado
       key={sessao.user.id}
       userId={sessao.user.id}
-      tema={tema}
-      onAlternarTema={alternarTema}
+      theme={tema}
+      onSwitchTheme={alternarTema}
     />
   );
 }
 
 interface PropsLogado {
   userId: string;
-  tema: Tema;
-  onAlternarTema: () => void;
+  theme: Tema;
+  onSwitchTheme: () => void;
 }
 
-function AppLogado({ userId, tema, onAlternarTema }: PropsLogado) {
+function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
   const {
     estado,
     carregando,
@@ -56,11 +55,15 @@ function AppLogado({ userId, tema, onAlternarTema }: PropsLogado) {
   const [modal, setModal] = useState<'entrada' | 'saida' | null>(null);
 
   async function sair() {
+    const confirmedLogout = confirm('Tem certeza que deseja sair?');
+
+    if (!confirmedLogout) return;
+
     limparCache(userId);
     await supabase.auth.signOut();
   }
 
-  async function recomecar() {
+  async function deleteProfile() {
     if (!confirm('Isso apaga seu perfil e todo o histórico, para sempre. Continuar?')) return;
     await resetar();
   }
@@ -69,12 +72,16 @@ function AppLogado({ userId, tema, onAlternarTema }: PropsLogado) {
     <header className="app-header">
       <span className="logo">💰</span>
       <h1>Guarda Certo</h1>
-      <ThemeSwitch tema={tema} onAlternar={onAlternarTema} />
-      <button className="btn-reset" onClick={recomecar} title="Recomeçar" disabled={salvando}>
-        ↺
+      <ThemeSwitch tema={theme} onAlternar={onSwitchTheme} />
+      <button className="btn-reset" onClick={deleteProfile} title="Recomeçar perfil" disabled={salvando}>
+        <span className="material-symbols-outlined">
+          delete_history
+        </span>
       </button>
-      <button className="btn-reset" onClick={sair} title="Sair da conta">
-        ⎋
+      <button className="btn-logout" onClick={sair} title="Sair da conta">
+        <span className="material-symbols-outlined">
+          logout
+        </span>
       </button>
     </header>
   );
@@ -94,8 +101,6 @@ function AppLogado({ userId, tema, onAlternarTema }: PropsLogado) {
     </div>
   );
 
-  // Sem perfil e ainda carregando, mostrar o onboarding seria um falso
-  // negativo — o perfil pode estar a caminho do servidor.
   if (carregando && !estado.perfil) {
     return (
       <div className="app">

@@ -115,6 +115,20 @@
 .btn-reset:hover:not(:disabled) { opacity: 1; }
 .btn-reset:disabled { cursor: not-allowed; }
 
+.btn-logout {
+  background: none;
+  border: none;
+  color: var(--saida-text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.btn-logout:hover:not(:disabled) { opacity: 1; }
+.btn-logout:disabled { cursor: not-allowed; }
+
 /* Botões do ThemeSwitch */
 .button {
   background: var(--surface-2);
