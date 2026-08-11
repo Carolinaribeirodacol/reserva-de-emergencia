@@ -1,25 +1,17 @@
-import type { PropsWithChildren } from "react";
-import { Button } from "./Button";
+import { Button } from './Button';
+import type { Tema } from '../hooks/useTema';
 
 interface Props {
-  theme: 'dark' | 'light'
+  tema: Tema;
+  onAlternar: () => void;
 }
 
-export function ThemeSwitch({theme, children}: PropsWithChildren<Props>) {
-  const handleClick = () => {
-    const shouldHandleTheme = confirm(`Deseja alterar o tema para ${theme}?`)
-
-    if (!shouldHandleTheme) {
-      return
-    }
-
-    document.body.classList.add(`${theme}-theme`)
-
-    const themeToRemove = theme === 'dark' ? 'light' : 'dark'
-    document.body.classList.remove(`${themeToRemove}-theme`)
-  }
+export function ThemeSwitch({ tema, onAlternar }: Props) {
+  const vaiPara = tema === 'dark' ? 'claro' : 'escuro';
 
   return (
-    <Button onClick={handleClick}>{children}</Button>
-  )
+    <Button onClick={onAlternar} title={`Mudar para o tema ${vaiPara}`}>
+      {tema === 'dark' ? '☀️' : '🌙'}
+    </Button>
+  );
 }

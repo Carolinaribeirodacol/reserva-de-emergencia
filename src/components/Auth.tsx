@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { ThemeSwitch } from './ThemeSwitch';
+import type { Tema } from '../hooks/useTema';
+
+interface Props {
+  tema: Tema;
+  onAlternarTema: () => void;
+}
 
 type Modo = 'entrar' | 'cadastrar';
 
@@ -16,7 +23,7 @@ function traduzirErro(mensagem: string): string {
   return mensagem;
 }
 
-export function Auth() {
+export function Auth({ tema, onAlternarTema }: Props) {
   const [modo, setModo] = useState<Modo>('entrar');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -67,6 +74,10 @@ export function Auth() {
 
   return (
     <div className="auth">
+      <div className="auth-topo">
+        <ThemeSwitch tema={tema} onAlternar={onAlternarTema} />
+      </div>
+
       <div className="onboarding-header">
         <span className="logo">💰</span>
         <h1>Guarda Certo</h1>

@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 exige Node 20.19+; fixar a versão evita surpresa quando o
+  # Netlify mudar o padrão dele.
+  NODE_VERSION = "22"
+
+# SPA: qualquer rota cai no index.html. Hoje o app não tem rotas, então
+# isso não muda nada — mas evita 404 no dia em que tiver.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

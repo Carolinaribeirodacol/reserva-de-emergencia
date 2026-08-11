@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import { supabase } from './lib/supabase';
 import { useSessao } from './hooks/useSessao';
+import { useTema, type Tema } from './hooks/useTema';
 import { useReserva, calcularMeta, gerarRecomendacao, limparCache } from './hooks/useReserva';
 import { Auth } from './components/Auth';
 import { Onboarding } from './components/Onboarding';
@@ -13,20 +14,34 @@ import { ThemeSwitch } from './components/ThemeSwitch';
 
 function App() {
   const { sessao, carregando } = useSessao();
+  const { tema, alternarTema } = useTema(sessao);
 
   if (carregando) {
     return <div className="tela-carregando">Carregando…</div>;
   }
 
   if (!sessao) {
-    return <Auth />;
+    return <Auth tema={tema} onAlternarTema={alternarTema} />;
   }
 
   // A key garante que todo o estado seja recriado ao trocar de usuário.
-  return <AppLogado key={sessao.user.id} userId={sessao.user.id} />;
+  return (
+    <AppLogado
+      key={sessao.user.id}
+      userId={sessao.user.id}
+      tema={tema}
+      onAlternarTema={alternarTema}
+    />
+  );
 }
 
-function AppLogado({ userId }: { userId: string }) {
+interface PropsLogado {
+  userId: string;
+  tema: Tema;
+  onAlternarTema: () => void;
+}
+
+function AppLogado({ userId, tema, onAlternarTema }: PropsLogado) {
   const {
     estado,
     carregando,
@@ -54,8 +69,7 @@ function AppLogado({ userId }: { userId: string }) {
     <header className="app-header">
       <span className="logo">💰</span>
       <h1>Guarda Certo</h1>
-      <ThemeSwitch theme="light">☀️</ThemeSwitch>
-      <ThemeSwitch theme="dark">🌙</ThemeSwitch>
+      <ThemeSwitch tema={tema} onAlternar={onAlternarTema} />
       <button className="btn-reset" onClick={recomecar} title="Recomeçar" disabled={salvando}>
         ↺
       </button>

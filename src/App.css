@@ -7,7 +7,7 @@
 }
 
 /* ── Temas ──────────────────────────────────────────────── */
-.light-theme {
+:root.light-theme {
   color-scheme: light;
 
   --bg: #f7f7f9;          /* fundo da página */
@@ -38,7 +38,7 @@
   --overlay: rgba(17, 24, 39, 0.45);
 }
 
-.dark-theme {
+:root.dark-theme {
   color-scheme: dark;
 
   --bg: #111827;
@@ -192,6 +192,11 @@
   flex-direction: column;
   gap: 24px;
   justify-content: center;
+}
+
+.auth-topo {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .tela-carregando {

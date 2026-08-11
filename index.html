@@ -5,6 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>reserva-de-emergencia</title>
+    <script>
+      (function () {
+        try {
+          var salvo = localStorage.getItem('tema');
+          var tema =
+            salvo === 'dark' || salvo === 'light'
+              ? salvo
+              : matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.classList.add(tema + '-theme');
+        } catch (e) {
+          document.documentElement.classList.add('light-theme');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
