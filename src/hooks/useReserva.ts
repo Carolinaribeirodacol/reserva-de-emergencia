@@ -141,7 +141,7 @@ export function useReserva(userId: string) {
     let vivo = true;
 
     buscarDoServidor()
-      .then(novoEstado => {
+      .then(novoEstado => { 
         if (!vivo) return;
         setEstado(novoEstado);
         setErro('');

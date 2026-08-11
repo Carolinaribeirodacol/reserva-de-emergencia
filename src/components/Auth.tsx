@@ -34,37 +34,55 @@ export function Auth({ tema, onAlternarTema }: Props) {
   const podeEnviar = email.includes('@') && senha.length >= 6 && !enviando;
 
   async function enviar(e: React.FormEvent) {
-    e.preventDefault();
-    if (!podeEnviar) return;
+  e.preventDefault();
 
-    setEnviando(true);
-    setErro('');
-    setAviso('');
+  if (!podeEnviar) return;
 
-    const credenciais = { email: email.trim(), password: senha };
-    const { data, error } =
-      modo === 'entrar'
-        ? await supabase.auth.signInWithPassword(credenciais)
-        : await supabase.auth.signUp(credenciais);
+  setEnviando(true);
+  setErro('');
+  setAviso('');
 
-    if (error) {
-      setErro(traduzirErro(error.message));
+  const credenciais = {
+    email: email.trim(),
+    password: senha,
+  };
+
+  const { data, error } =
+    modo === 'entrar'
+      ? await supabase.auth.signInWithPassword(credenciais)
+      : await supabase.auth.signUp(credenciais);
+
+  if (error) {
+    setErro(traduzirErro(error.message));
+    setEnviando(false);
+    return;
+  }
+
+  if (modo === 'cadastrar') {
+    if (data.user?.identities?.length === 0) {
+      setAviso(
+        'Você já possui uma conta com este e-mail. Entre na sua conta para continuar.'
+      );
+
+      setModo('entrar');
+      setSenha('');
       setEnviando(false);
+
       return;
     }
 
-    // Com confirmação de e-mail ligada, o signUp não devolve sessão:
-    // o usuário só entra depois de clicar no link.
-    if (modo === 'cadastrar' && !data.session) {
-      setAviso('Conta criada! Confirme o link enviado para o seu e-mail e depois entre.');
+    if (!data.session) {
+      setAviso(
+        'Conta criada! Confirme o link enviado para o seu e-mail e depois entre.'
+      );
+
       setModo('entrar');
       setSenha('');
     }
-
-    setEnviando(false);
-    // Sucesso com sessão não precisa de tratamento: o onAuthStateChange
-    // do useSessao troca a tela sozinho.
   }
+
+  setEnviando(false);
+}
 
   function trocarModo() {
     setModo(m => (m === 'entrar' ? 'cadastrar' : 'entrar'));
