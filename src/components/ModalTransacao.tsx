@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatCurrency } from '../helpers/currency';
+import { currencyToNumber, formatCurrency } from '../helpers/currency';
 
 interface Props {
   tipo: 'entrada' | 'saida';
@@ -16,9 +16,8 @@ export function ModalTransacao({ tipo, salvando = false, onConfirmar, onCancelar
   const [motivo, setMotivo] = useState('');
 
   const motivos = tipo === 'entrada' ? motivosEntrada : motivosSaida;
-  // O gravar agora é assíncrono: sem o `!salvando`, um duplo clique
-  // insere a mesma movimentação duas vezes.
-  const podeConfirmar = !!valor && parseFloat(valor) > 0 && !!motivo && !salvando;
+  const valorNumerico = currencyToNumber(valor);
+  const podeConfirmar = valorNumerico > 0 && !!motivo && !salvando;
 
   return (
     <div className="modal-overlay" onClick={onCancelar}>
@@ -58,7 +57,7 @@ export function ModalTransacao({ tipo, salvando = false, onConfirmar, onCancelar
           <button
             className="btn-primary"
             disabled={!podeConfirmar}
-            onClick={() => onConfirmar(parseFloat(valor), motivo)}
+            onClick={() => onConfirmar(valorNumerico, motivo)}
           >
             {salvando ? 'Salvando…' : 'Confirmar'}
           </button>

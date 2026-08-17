@@ -60,7 +60,7 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
               <span>R$</span>
               <input
                 type="text"
-                min="0"
+                inputMode="numeric"
                 placeholder="2.500"
                 value={renda}
                 onChange={e => setRenda(formatCurrency(e.target.value))}
@@ -77,11 +77,11 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
             <div className="input-wrapper">
               <span>R$</span>
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputMode="numeric"
                 placeholder="2.000"
                 value={gastos}
-                onChange={e => setGastos(e.target.value)}
+                onChange={e => setGastos(formatCurrency(e.target.value))}
                 autoFocus
               />
             </div>
