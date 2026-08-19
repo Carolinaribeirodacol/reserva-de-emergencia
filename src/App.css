@@ -406,6 +406,12 @@
 .painel-valor { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-h); }
 .painel-desc { margin: 0; font-size: 0.75rem; color: var(--text); }
 
+.anuncio {
+  min-height: 100px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
 /* ── Ações ──────────────────────────────────────────────── */
 .acoes {
   display: grid;

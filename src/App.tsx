@@ -10,6 +10,7 @@ import { BarraProgresso } from './components/BarraProgresso';
 import { PainelMeta } from './components/PainelMeta';
 import { ModalTransacao } from './components/ModalTransacao';
 import { Recomendacao } from './components/Recomendacao';
+import { Anuncio } from './components/Anuncio';
 import { ThemeSwitch } from './components/ThemeSwitch';
 
 function App() {
@@ -150,6 +151,8 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
         </div>
 
         <Recomendacao mensagem={recomendacao} transacoes={estado.transacoes} />
+
+        <Anuncio slot="1264721992" />
       </main>
 
       {modal && (
