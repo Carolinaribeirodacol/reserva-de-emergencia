@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ThemeSwitch } from './ThemeSwitch';
+import { CampoSenha } from './CampoSenha';
+import { DICA_SENHA, senhaAtendeRequisitos, traduzirErroSenha } from '../helpers/senha';
 import type { Tema } from '../hooks/useTema';
 
 interface Props {
@@ -8,15 +10,15 @@ interface Props {
   onAlternarTema: () => void;
 }
 
-type Modo = 'entrar' | 'cadastrar';
+type Modo = 'entrar' | 'cadastrar' | 'recuperar';
 
-/** As mensagens do Supabase vêm em inglês; traduzimos as mais comuns. */
 function traduzirErro(mensagem: string): string {
   const m = mensagem.toLowerCase();
+  const erroSenha = traduzirErroSenha(m);
+  if (erroSenha) return erroSenha;
   if (m.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
   if (m.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar.';
   if (m.includes('user already registered')) return 'Esse e-mail já tem cadastro. Tente entrar.';
-  if (m.includes('password should be at least')) return 'A senha precisa de pelo menos 6 caracteres.';
   if (m.includes('unable to validate email')) return 'E-mail inválido.';
   if (m.includes('rate limit') || m.includes('too many')) return 'Muitas tentativas. Espere um pouco e tente de novo.';
   if (m.includes('failed to fetch')) return 'Sem conexão com o servidor. Verifique sua internet.';
@@ -31,7 +33,12 @@ export function Auth({ tema, onAlternarTema }: Props) {
   const [aviso, setAviso] = useState('');
   const [enviando, setEnviando] = useState(false);
 
-  const podeEnviar = email.includes('@') && senha.length >= 6 && !enviando;
+  const podeEnviar =
+    modo === 'recuperar'
+      ? email.includes('@') && !enviando
+      : modo === 'cadastrar'
+        ? email.includes('@') && senhaAtendeRequisitos(senha) && !enviando
+        : email.includes('@') && senha.length >= 6 && !enviando;
 
   async function enviar(e: React.FormEvent) {
   e.preventDefault();
@@ -41,6 +48,23 @@ export function Auth({ tema, onAlternarTema }: Props) {
   setEnviando(true);
   setErro('');
   setAviso('');
+
+  if (modo === 'recuperar') {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: window.location.origin,
+    });
+
+    setEnviando(false);
+
+    if (error) {
+      setErro(traduzirErro(error.message));
+      return;
+    }
+
+    setAviso('Se esse e-mail tiver cadastro, enviamos um link para redefinir a senha.');
+    setModo('entrar');
+    return;
+  }
 
   const credenciais = {
     email: email.trim(),
@@ -90,6 +114,13 @@ export function Auth({ tema, onAlternarTema }: Props) {
     setAviso('');
   }
 
+  function irParaRecuperar() {
+    setModo('recuperar');
+    setSenha('');
+    setErro('');
+    setAviso('');
+  }
+
   return (
     <div className="auth">
       <div className="auth-topo">
@@ -103,10 +134,20 @@ export function Auth({ tema, onAlternarTema }: Props) {
       </div>
 
       <form className="onboarding-card" onSubmit={enviar}>
-        <h2>{modo === 'entrar' ? 'Entrar na sua conta' : 'Criar uma conta'}</h2>
+        <h2>
+          {modo === 'entrar'
+            ? 'Entrar na sua conta'
+            : modo === 'cadastrar'
+              ? 'Criar uma conta'
+              : 'Recuperar senha'}
+        </h2>
+
+        {modo === 'recuperar' && (
+          <p className="dica">Enviamos um link para você escolher uma senha nova.</p>
+        )}
 
         <div className="input-wrapper">
-          <span>@</span>
+          <span>📧</span>
           <input
             type="email"
             placeholder="seu@email.com"
@@ -117,33 +158,49 @@ export function Auth({ tema, onAlternarTema }: Props) {
           />
         </div>
 
-        <div className="input-wrapper">
-          <span>🔒</span>
-          <input
-            type="password"
+        {modo !== 'recuperar' && (
+          <CampoSenha
+            value={senha}
+            onChange={setSenha}
             placeholder="sua senha"
             autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'}
-            value={senha}
-            onChange={e => setSenha(e.target.value)}
           />
-        </div>
+        )}
 
         {modo === 'cadastrar' && (
-          <p className="dica">Mínimo de 6 caracteres.</p>
+          <p className="dica">{DICA_SENHA}</p>
+        )}
+
+        {modo === 'entrar' && (
+          <button className="btn-link" type="button" onClick={irParaRecuperar}>
+            Esqueci minha senha
+          </button>
         )}
 
         {erro && <p className="mensagem-erro">{erro}</p>}
         {aviso && <p className="mensagem-aviso">{aviso}</p>}
 
         <button className="btn-primary" type="submit" disabled={!podeEnviar}>
-          {enviando ? 'Aguarde…' : modo === 'entrar' ? 'Entrar' : 'Criar conta'}
+          {enviando
+            ? 'Aguarde…'
+            : modo === 'entrar'
+              ? 'Entrar'
+              : modo === 'cadastrar'
+                ? 'Criar conta'
+                : 'Enviar link de recuperação'}
         </button>
 
-        <button className="btn-link" type="button" onClick={trocarModo}>
-          {modo === 'entrar'
-            ? 'Ainda não tem conta? Cadastre-se'
-            : 'Já tem conta? Entrar'}
-        </button>
+        {modo === 'recuperar' ? (
+          <button className="btn-link" type="button" onClick={() => { setModo('entrar'); setErro(''); setAviso(''); }}>
+            Voltar para entrar
+          </button>
+        ) : (
+          <button className="btn-link" type="button" onClick={trocarModo}>
+            {modo === 'entrar'
+              ? 'Ainda não tem conta? Cadastre-se'
+              : 'Já tem conta? Entrar'}
+          </button>
+        )}
       </form>
     </div>
   );

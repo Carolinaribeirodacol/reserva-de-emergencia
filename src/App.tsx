@@ -5,6 +5,7 @@ import { useSessao } from './hooks/useSessao';
 import { useTema, type Tema } from './hooks/useTema';
 import { useReserva, calcularMeta, gerarRecomendacao, limparCache } from './hooks/useReserva';
 import { Auth } from './components/Auth';
+import { RedefinirSenha } from './components/RedefinirSenha';
 import { Onboarding } from './components/Onboarding';
 import { BarraProgresso } from './components/BarraProgresso';
 import { PainelMeta } from './components/PainelMeta';
@@ -14,11 +15,21 @@ import { Anuncio } from './components/Anuncio';
 import { ThemeSwitch } from './components/ThemeSwitch';
 
 function App() {
-  const { sessao, carregando } = useSessao();
+  const { sessao, carregando, recuperandoSenha, concluirRecuperacao } = useSessao();
   const { tema, alternarTema } = useTema(sessao);
 
   if (carregando) {
     return <div className="tela-carregando">Carregando…</div>;
+  }
+
+  if (recuperandoSenha) {
+    return (
+      <RedefinirSenha
+        tema={tema}
+        onAlternarTema={alternarTema}
+        onConcluir={concluirRecuperacao}
+      />
+    );
   }
 
   if (!sessao) {

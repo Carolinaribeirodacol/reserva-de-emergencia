@@ -2,14 +2,10 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
-/**
- * Sessão do usuário logado. `carregando` cobre o intervalo entre o boot e a
- * resposta do getSession() — sem ele, a tela de login pisca antes da sessão
- * salva ser recuperada.
- */
 export function useSessao() {
   const [sessao, setSessao] = useState<Session | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const [recuperandoSenha, setRecuperandoSenha] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -17,13 +13,19 @@ export function useSessao() {
       setCarregando(false);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_evento, novaSessao) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((evento, novaSessao) => {
       setSessao(novaSessao);
       setCarregando(false);
+      if (evento === 'PASSWORD_RECOVERY') setRecuperandoSenha(true);
     });
 
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  return { sessao, carregando };
+  return {
+    sessao,
+    carregando,
+    recuperandoSenha,
+    concluirRecuperacao: () => setRecuperandoSenha(false),
+  };
 }

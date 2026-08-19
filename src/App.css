@@ -283,6 +283,20 @@
   color: var(--text-h);
 }
 
+.btn-olho {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-olho:hover { opacity: 1; }
+.btn-olho .material-symbols-outlined { font-size: 1.3rem; }
+
 /* ── Buttons ─────────────────────────────────────────── */
 .btn-primary {
   background: var(--accent);

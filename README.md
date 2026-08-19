@@ -34,6 +34,11 @@ explícita, em vez de dar erro de rede confuso mais tarde.
 4. Em **Authentication → Providers**, deixe *Email* habilitado. Se quiser testar
    sem abrir o e-mail a cada cadastro, desligue *Confirm email* enquanto
    desenvolve.
+5. Em **Authentication → URL Configuration**, adicione em *Redirect URLs* os
+   endereços de onde o app roda — `http://localhost:5173/*` para
+   desenvolvimento e a URL do Netlify em produção. O "esqueci minha senha"
+   manda o usuário de volta para cá; sem essa lista, o Supabase rejeita o
+   redirect e o link do e-mail não funciona.
 
 ### Por que o RLS não é opcional
 
