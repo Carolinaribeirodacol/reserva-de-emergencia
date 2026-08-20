@@ -1,4 +1,4 @@
-# Guarda Certo 💰
+# Reserva de Emergência 💰
 
 Assistente de reserva de emergência: calcula a meta a partir do seu perfil,
 acompanha o progresso e registra as movimentações.

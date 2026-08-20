@@ -27,7 +27,7 @@ Ao final, apresente sugestões criativas para transformar essa ideia em um proje
 
 Arquitetou proposta completa de app financeiro com personas e fluxos UX
 Arquitetou proposta completa de app financeiro com personas e fluxos UX
-Educador Financeiro Inteligente — "Guarda Certo"
+Educador Financeiro Inteligente — "Reserva de Emergência"
 A ideia em uma frase
 
 Um assistente que responde duas perguntas que travam quem quer montar reserva de emergência: "quanto eu preciso guardar por mês?" e "quanto falta pra minha meta?" — e mostra isso de forma visual, sem economês.

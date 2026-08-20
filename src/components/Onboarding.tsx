@@ -41,7 +41,7 @@ export function Onboarding({ onConcluir, salvando = false }: Props) {
     <div className="onboarding">
       <div className="onboarding-header">
         <span className="logo">💰</span>
-        <h1>Guarda Certo</h1>
+        <h1>Reserva de Emergência</h1>
         <p>Seu assistente de reserva de emergência</p>
       </div>
 

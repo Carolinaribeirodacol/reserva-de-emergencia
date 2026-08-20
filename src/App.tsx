@@ -10,6 +10,7 @@ import { Onboarding } from './components/Onboarding';
 import { BarraProgresso } from './components/BarraProgresso';
 import { PainelMeta } from './components/PainelMeta';
 import { ModalTransacao } from './components/ModalTransacao';
+import { ModalConfirmacao } from './components/ModalConfirmacao';
 import { Recomendacao } from './components/Recomendacao';
 import { Anuncio } from './components/Anuncio';
 import { ThemeSwitch } from './components/ThemeSwitch';
@@ -65,38 +66,60 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
     resetar,
   } = useReserva(userId);
   const [modal, setModal] = useState<'entrada' | 'saida' | null>(null);
+  const [confirmando, setConfirmando] = useState<'sair' | 'apagar' | null>(null);
 
   async function sair() {
-    const confirmedLogout = confirm('Tem certeza que deseja sair?');
-
-    if (!confirmedLogout) return;
-
+    setConfirmando(null);
     limparCache(userId);
     await supabase.auth.signOut();
   }
 
-  async function deleteProfile() {
-    if (!confirm('Isso apaga seu perfil e todo o histórico, para sempre. Continuar?')) return;
+  async function apagarPerfil() {
     await resetar();
+    setConfirmando(null);
   }
 
   const cabecalho = (
     <header className="app-header">
       <span className="logo">💰</span>
-      <h1>Guarda Certo</h1>
+      <h1>Reserva de Emergência</h1>
+
       <ThemeSwitch tema={theme} onAlternar={onSwitchTheme} />
-      <button className="btn-reset" onClick={deleteProfile} title="Recomeçar perfil" disabled={salvando}>
+
+      <button className="btn-reset" onClick={() => setConfirmando('apagar')} title="Recomeçar perfil" disabled={salvando}>
         <span className="material-symbols-outlined">
           delete_history
         </span>
       </button>
-      <button className="btn-logout" onClick={sair} title="Sair da conta">
+
+      <button className="btn-logout" onClick={() => setConfirmando('sair')} title="Sair da conta">
         <span className="material-symbols-outlined">
           logout
         </span>
       </button>
     </header>
   );
+
+  const modalConfirmacao =
+    confirmando === 'apagar' ? (
+      <ModalConfirmacao
+        titulo="Recomeçar do zero?"
+        mensagem="Isso apaga seu perfil e todo o histórico de movimentações, para sempre."
+        textoConfirmar="Apagar tudo"
+        perigo
+        confirmando={salvando}
+        onConfirmar={apagarPerfil}
+        onCancelar={() => setConfirmando(null)}
+      />
+    ) : confirmando === 'sair' ? (
+      <ModalConfirmacao
+        titulo="Sair da conta?"
+        mensagem="Você pode entrar de novo quando quiser."
+        textoConfirmar="Sair"
+        onConfirmar={sair}
+        onCancelar={() => setConfirmando(null)}
+      />
+    ) : null;
 
   const avisoErro = erro && (
     <div className="mensagem-erro banner-erro">
@@ -121,6 +144,7 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
           {avisoErro}
           <p className="dica">Carregando seus dados…</p>
         </main>
+        {modalConfirmacao}
       </div>
     );
   }
@@ -143,38 +167,44 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
   }
 
   return (
-    <div className="app">
-      {cabecalho}
+    <>
+      <div className="app">
+        {cabecalho}
 
-      <main className="app-main">
-        {avisoErro}
+        <main className="app-main">
+          {avisoErro}
 
-        <BarraProgresso saldo={estado.saldo} meta={meta} />
-        <PainelMeta perfil={estado.perfil} saldo={estado.saldo} />
+          <BarraProgresso saldo={estado.saldo} meta={meta} />
+          <PainelMeta perfil={estado.perfil} saldo={estado.saldo} />
 
-        <div className="acoes">
-          <button className="btn-entrada" onClick={() => setModal('entrada')}>
-            + Guardei dinheiro
-          </button>
-          <button className="btn-saida" onClick={() => setModal('saida')}>
-            − Precisei usar
-          </button>
-        </div>
+          <div className="acoes">
+            <button className="btn-entrada" onClick={() => setModal('entrada')}>
+              + Guardei dinheiro
+            </button>
+            <button className="btn-saida" onClick={() => setModal('saida')}>
+              − Precisei usar
+            </button>
+          </div>
 
-        <Recomendacao mensagem={recomendacao} transacoes={estado.transacoes} />
+          <Recomendacao mensagem={recomendacao} transacoes={estado.transacoes} />
 
-        <Anuncio slot="1264721992" />
-      </main>
+          <Anuncio slot="1264721992" />
+        </main>
 
-      {modal && (
-        <ModalTransacao
-          tipo={modal}
-          salvando={salvando}
-          onConfirmar={confirmarTransacao}
-          onCancelar={() => setModal(null)}
-        />
-      )}
-    </div>
+        {modal && (
+          <ModalTransacao
+            tipo={modal}
+            salvando={salvando}
+            onConfirmar={confirmarTransacao}
+            onCancelar={() => setModal(null)}
+          />
+        )}
+
+        {modalConfirmacao}
+      </div>
+
+      <Anuncio slot="6230660523" className="anuncio-lateral" />
+    </>
   );
 }
 

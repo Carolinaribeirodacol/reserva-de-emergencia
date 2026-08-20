@@ -129,8 +129,8 @@ export function Auth({ tema, onAlternarTema }: Props) {
 
       <div className="onboarding-header">
         <span className="logo">💰</span>
-        <h1>Guarda Certo</h1>
-        <p>Seus dados salvos na nuvem, em qualquer dispositivo</p>
+        <h1>Reserva de Emergência</h1>
+        <p>Saiba o quanto falta para alcançar o seu objetivo!</p>
       </div>
 
       <form className="onboarding-card" onSubmit={enviar}>

@@ -10,9 +10,10 @@ const AD_CLIENT = 'ca-pub-1023395020108641';
 
 interface Props {
   slot: string;
+  className?: string;
 }
 
-export function Anuncio({ slot }: Props) {
+export function Anuncio({ slot, className }: Props) {
   const preenchido = useRef(false);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function Anuncio({ slot }: Props) {
 
   return (
     <ins
-      className="adsbygoogle anuncio"
+      className={`adsbygoogle anuncio ${className ?? ''}`}
       style={{ display: 'block' }}
       data-ad-client={AD_CLIENT}
       data-ad-slot={slot}

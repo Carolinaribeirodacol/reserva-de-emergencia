@@ -312,6 +312,8 @@
 .btn-primary:hover:not(:disabled) { opacity: 0.88; }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
+.btn-primary.btn-perigo { background: var(--danger); }
+
 .btn-secondary {
   background: none;
   border: 2px solid var(--border);
@@ -426,7 +428,23 @@
   margin-top: 8px;
 }
 
-/* ── Ações ──────────────────────────────────────────────── */
+.anuncio-lateral {
+  display: none !important;
+  position: fixed;
+  top: 50%;
+  right: max(0px, calc((100vw - 1126px) / 2));
+  transform: translateY(-50%);
+  width: 160px;
+  min-height: 250px;
+  margin-top: 0;
+}
+
+@media (min-width: 1025px) {
+  .anuncio-lateral {
+    display: block !important;
+  }
+}
+
 .acoes {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -459,7 +477,6 @@
 }
 .btn-saida:hover { opacity: 0.82; }
 
-/* ── Recomendação ───────────────────────────────────────── */
 .recomendacao {
   display: flex;
   gap: 12px;
@@ -472,7 +489,6 @@
 .recomendacao-icon { font-size: 1.4rem; flex-shrink: 0; }
 .recomendacao p { margin: 0; font-size: 0.92rem; color: var(--text-h); line-height: 1.5; }
 
-/* ── Histórico ──────────────────────────────────────────── */
 .historico { margin-top: 4px; }
 .historico h3 { font-size: 0.95rem; margin: 0 0 10px; }
 .historico ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -511,13 +527,12 @@
 .historico-item.entrada .historico-valor { color: var(--entrada-text); }
 .historico-item.saida .historico-valor   { color: var(--saida-text); }
 
-/* ── Modal ──────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background: var(--overlay);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 0 0 24px;
@@ -542,7 +557,6 @@
   gap: 12px;
 }
 
-/* ── Legacy placeholder (keep parser happy) ─────────────── */
 .hero {
   position: relative;
 

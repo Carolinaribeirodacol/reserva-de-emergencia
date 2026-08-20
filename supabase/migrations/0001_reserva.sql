@@ -1,4 +1,4 @@
--- Guarda Certo — schema inicial
+-- Reserva de Emergência — schema inicial
 -- Rode este arquivo no SQL Editor do Supabase (ou via `supabase db push`).
 
 -- ── Perfis ────────────────────────────────────────────────
