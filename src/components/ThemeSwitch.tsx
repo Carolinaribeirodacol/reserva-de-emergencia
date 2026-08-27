@@ -1,21 +1,21 @@
 import { Button } from './Button';
-import type { Tema } from '../hooks/useTema';
+import type { Theme } from '../hooks/useTheme';
 
 interface Props {
-  tema: Tema;
-  onAlternar: () => void;
+  theme: Theme;
+  onToggle: () => void;
 }
 
-export function ThemeSwitch({ tema, onAlternar }: Props) {
-  const vaiPara = tema === 'dark' ? 'claro' : 'escuro';
+export function ThemeSwitch({ theme, onToggle }: Props) {
+  const goingTo = theme === 'dark' ? 'claro' : 'escuro';
 
   return (
-    <Button onClick={onAlternar} title={`Mudar para o tema ${vaiPara}`}>
+    <Button onClick={onToggle} title={`Mudar para o tema ${goingTo}`}>
       {
-        tema === 'dark' ? 
+        theme === 'dark' ?
           <span className="material-symbols-outlined">
             light_mode
-          </span> : 
+          </span> :
           <span className="material-symbols-outlined">
             dark_mode
           </span>

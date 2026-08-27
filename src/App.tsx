@@ -1,98 +1,119 @@
 import { useState } from 'react';
 import './App.css';
 import { supabase } from './lib/supabase';
-import { useSessao } from './hooks/useSessao';
-import { useTema, type Tema } from './hooks/useTema';
-import { useReserva, calcularMeta, gerarRecomendacao, limparCache } from './hooks/useReserva';
+import { useSession } from './hooks/useSession';
+import { useTheme, type Theme } from './hooks/useTheme';
+import { useRoute, type Route } from './hooks/useRoute';
+import { useEmergencyFund, calculateGoal, generateRecommendation, clearCache } from './hooks/useEmergencyFund';
 import { Auth } from './components/Auth';
-import { RedefinirSenha } from './components/RedefinirSenha';
+import { ResetPassword } from './components/ResetPassword';
 import { Onboarding } from './components/Onboarding';
-import { BarraProgresso } from './components/BarraProgresso';
-import { PainelMeta } from './components/PainelMeta';
-import { ModalTransacao } from './components/ModalTransacao';
-import { ModalConfirmacao } from './components/ModalConfirmacao';
-import { Recomendacao } from './components/Recomendacao';
-import { Anuncio } from './components/Anuncio';
+import { ProgressBar } from './components/ProgressBar';
+import { GoalPanel } from './components/GoalPanel';
+import { TransactionModal } from './components/TransactionModal';
+import { ConfirmationModal } from './components/ConfirmationModal';
+import { Recommendation } from './components/Recommendation';
+import { Ad } from './components/Ad';
 import { ThemeSwitch } from './components/ThemeSwitch';
+import { Privacy } from './components/Privacy';
+import { Terms } from './components/Terms';
+import { Footer } from './components/Footer';
+import { Home } from './components/Home';
+import logo from './assets/images/logo.png';
 
 function App() {
-  const { sessao, carregando, recuperandoSenha, concluirRecuperacao } = useSessao();
-  const { tema, alternarTema } = useTema(sessao);
+  const { session, loading, recoveringPassword, finishRecovery } = useSession();
+  const { theme, toggleTheme } = useTheme(session);
+  const { route, goTo } = useRoute();
 
-  if (carregando) {
-    return <div className="tela-carregando">Carregando…</div>;
+  // Legal pages stay outside the login flow: they need to be
+  // accessible (and indexable) even without a session.
+  if (route === '/privacidade') {
+    return <Privacy goTo={goTo} />;
+  }
+  if (route === '/termos') {
+    return <Terms goTo={goTo} />;
   }
 
-  if (recuperandoSenha) {
+  if (loading) {
+    return <div className="loading-screen">Carregando…</div>;
+  }
+
+  if (recoveringPassword) {
     return (
-      <RedefinirSenha
-        tema={tema}
-        onAlternarTema={alternarTema}
-        onConcluir={concluirRecuperacao}
+      <ResetPassword
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onFinish={finishRecovery}
       />
     );
   }
 
-  if (!sessao) {
-    return <Auth tema={tema} onAlternarTema={alternarTema} />;
+  if (!session) {
+    if (route === '/entrar') {
+      return <Auth theme={theme} onToggleTheme={toggleTheme} goTo={goTo} />;
+    }
+    return <Home theme={theme} onToggleTheme={toggleTheme} goTo={goTo} />;
   }
 
   return (
-    <AppLogado
-      key={sessao.user.id}
-      userId={sessao.user.id}
-      theme={tema}
-      onSwitchTheme={alternarTema}
+    <LoggedInApp
+      key={session.user.id}
+      userId={session.user.id}
+      theme={theme}
+      onToggleTheme={toggleTheme}
+      goTo={goTo}
     />
   );
 }
 
-interface PropsLogado {
+interface LoggedInAppProps {
   userId: string;
-  theme: Tema;
-  onSwitchTheme: () => void;
+  theme: Theme;
+  onToggleTheme: () => void;
+  goTo: (route: Route) => void;
 }
 
-function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
+function LoggedInApp({ userId, theme, onToggleTheme, goTo }: LoggedInAppProps) {
   const {
-    estado,
-    carregando,
-    salvando,
-    erro,
-    limparErro,
-    recarregar,
-    salvarPerfil,
-    adicionarTransacao,
-    resetar,
-  } = useReserva(userId);
-  const [modal, setModal] = useState<'entrada' | 'saida' | null>(null);
-  const [confirmando, setConfirmando] = useState<'sair' | 'apagar' | null>(null);
+    state,
+    loading,
+    saving,
+    error,
+    clearError,
+    reload,
+    saveProfile,
+    addTransaction,
+    reset,
+  } = useEmergencyFund(userId);
+  const [modal, setModal] = useState<'deposit' | 'withdrawal' | null>(null);
+  const [confirming, setConfirming] = useState<'logout' | 'reset' | null>(null);
 
-  async function sair() {
-    setConfirmando(null);
-    limparCache(userId);
+  async function logout() {
+    setConfirming(null);
+    clearCache(userId);
     await supabase.auth.signOut();
   }
 
-  async function apagarPerfil() {
-    await resetar();
-    setConfirmando(null);
+  async function resetProfile() {
+    await reset();
+    setConfirming(null);
   }
 
-  const cabecalho = (
+  const header = (
     <header className="app-header">
-      <span className="logo">💰</span>
+      <img src={logo} alt="Reserva de Emergência" className="logo" />
       <h1>Reserva de Emergência</h1>
 
-      <ThemeSwitch tema={theme} onAlternar={onSwitchTheme} />
+      <ThemeSwitch theme={theme} onToggle={onToggleTheme} />
 
-      <button className="btn-reset" onClick={() => setConfirmando('apagar')} title="Recomeçar perfil" disabled={salvando}>
+      <button className="btn-reset" onClick={() => setConfirming('reset')} title="Recomeçar perfil" disabled={saving}>
         <span className="material-symbols-outlined">
           delete_history
         </span>
       </button>
 
-      <button className="btn-logout" onClick={() => setConfirmando('sair')} title="Sair da conta">
+      <button className="btn-logout" onClick={() => setConfirming('logout')} title="Sair da conta">
         <span className="material-symbols-outlined">
           logout
         </span>
@@ -100,35 +121,35 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
     </header>
   );
 
-  const modalConfirmacao =
-    confirmando === 'apagar' ? (
-      <ModalConfirmacao
-        titulo="Recomeçar do zero?"
-        mensagem="Isso apaga seu perfil e todo o histórico de movimentações, para sempre."
-        textoConfirmar="Apagar tudo"
-        perigo
-        confirmando={salvando}
-        onConfirmar={apagarPerfil}
-        onCancelar={() => setConfirmando(null)}
+  const confirmationModal =
+    confirming === 'reset' ? (
+      <ConfirmationModal
+        title="Recomeçar do zero?"
+        message="Isso apaga seu perfil e todo o histórico de movimentações, para sempre."
+        confirmText="Apagar tudo"
+        danger
+        confirming={saving}
+        onConfirm={resetProfile}
+        onCancel={() => setConfirming(null)}
       />
-    ) : confirmando === 'sair' ? (
-      <ModalConfirmacao
-        titulo="Sair da conta?"
-        mensagem="Você pode entrar de novo quando quiser."
-        textoConfirmar="Sair"
-        onConfirmar={sair}
-        onCancelar={() => setConfirmando(null)}
+    ) : confirming === 'logout' ? (
+      <ConfirmationModal
+        title="Sair da conta?"
+        message="Você pode entrar de novo quando quiser."
+        confirmText="Sair"
+        onConfirm={logout}
+        onCancel={() => setConfirming(null)}
       />
     ) : null;
 
-  const avisoErro = erro && (
-    <div className="mensagem-erro banner-erro">
-      <span>{erro}</span>
+  const errorNotice = error && (
+    <div className="error-message error-banner">
+      <span>{error}</span>
       <button
         className="btn-link"
         onClick={() => {
-          limparErro();
-          recarregar();
+          clearError();
+          reload();
         }}
       >
         tentar de novo
@@ -136,74 +157,76 @@ function AppLogado({ userId, theme, onSwitchTheme }: PropsLogado) {
     </div>
   );
 
-  if (carregando && !estado.perfil) {
+  if (loading && !state.profile) {
     return (
       <div className="app">
-        {cabecalho}
+        {header}
         <main className="app-main">
-          {avisoErro}
-          <p className="dica">Carregando seus dados…</p>
+          {errorNotice}
+          <p className="hint">Carregando seus dados…</p>
         </main>
-        {modalConfirmacao}
+        {confirmationModal}
       </div>
     );
   }
 
-  if (!estado.perfil) {
+  if (!state.profile) {
     return (
       <>
-        {avisoErro}
-        <Onboarding onConcluir={salvarPerfil} salvando={salvando} />
+        {errorNotice}
+        <Onboarding onFinish={saveProfile} saving={saving} />
       </>
     );
   }
 
-  const { meta } = calcularMeta(estado.perfil);
-  const recomendacao = gerarRecomendacao(estado.perfil, estado.saldo);
+  const { targetAmount } = calculateGoal(state.profile);
+  const recommendation = generateRecommendation(state.profile, state.balance);
 
-  async function confirmarTransacao(valor: number, motivo: string) {
-    const ok = await adicionarTransacao(modal!, valor, motivo);
+  async function confirmTransaction(amount: number, reason: string) {
+    const ok = await addTransaction(modal!, amount, reason);
     if (ok) setModal(null);
   }
 
   return (
     <>
       <div className="app">
-        {cabecalho}
+        {header}
 
         <main className="app-main">
-          {avisoErro}
+          {errorNotice}
 
-          <BarraProgresso saldo={estado.saldo} meta={meta} />
-          <PainelMeta perfil={estado.perfil} saldo={estado.saldo} />
+          <ProgressBar balance={state.balance} target={targetAmount} />
+          <GoalPanel profile={state.profile} balance={state.balance} />
 
-          <div className="acoes">
-            <button className="btn-entrada" onClick={() => setModal('entrada')}>
+          <div className="actions">
+            <button className="btn-deposit" onClick={() => setModal('deposit')}>
               + Guardei dinheiro
             </button>
-            <button className="btn-saida" onClick={() => setModal('saida')}>
+            <button className="btn-withdrawal" onClick={() => setModal('withdrawal')}>
               − Precisei usar
             </button>
           </div>
 
-          <Recomendacao mensagem={recomendacao} transacoes={estado.transacoes} />
+          <Recommendation message={recommendation} transactions={state.transactions} />
 
-          <Anuncio slot="1264721992" />
+          <Ad slot="1264721992" />
         </main>
 
+        <Footer goTo={goTo} />
+
         {modal && (
-          <ModalTransacao
-            tipo={modal}
-            salvando={salvando}
-            onConfirmar={confirmarTransacao}
-            onCancelar={() => setModal(null)}
+          <TransactionModal
+            type={modal}
+            saving={saving}
+            onConfirm={confirmTransaction}
+            onCancel={() => setModal(null)}
           />
         )}
 
-        {modalConfirmacao}
+        {confirmationModal}
       </div>
 
-      <Anuncio slot="6230660523" className="anuncio-lateral" />
+      <Ad slot="6230660523" className="ad-sidebar" />
     </>
   );
 }

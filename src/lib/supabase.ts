@@ -10,8 +10,8 @@ if (!url || !anonKey) {
   );
 }
 
-// A chave anon é pública por design — ela vai no bundle do navegador.
-// Quem protege os dados é o Row Level Security do banco, não essa chave.
+// The anon key is public by design — it ships in the browser bundle.
+// What protects the data is the database's Row Level Security, not this key.
 export const supabase = createClient(url, anonKey, {
   auth: {
     persistSession: true,

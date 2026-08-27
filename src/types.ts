@@ -1,20 +1,20 @@
-export interface Perfil {
-  renda: number;
-  gastos: number;
-  idade: number;
-  objetivo: 'estabilidade' | 'viagem' | 'outro';
+export interface Profile {
+  income: number;
+  expenses: number;
+  age: number;
+  goal: 'stability' | 'travel' | 'other';
 }
 
-export interface Transacao {
+export interface Transaction {
   id: string;
-  tipo: 'entrada' | 'saida';
-  valor: number;
-  motivo: string;
-  data: string;
+  type: 'deposit' | 'withdrawal';
+  amount: number;
+  reason: string;
+  date: string;
 }
 
-export interface Estado {
-  perfil: Perfil | null;
-  saldo: number;
-  transacoes: Transacao[];
+export interface AppState {
+  profile: Profile | null;
+  balance: number;
+  transactions: Transaction[];
 }

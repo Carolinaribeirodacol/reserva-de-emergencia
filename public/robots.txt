@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reserva-de-emergencia.netlify.app/sitemap.xml

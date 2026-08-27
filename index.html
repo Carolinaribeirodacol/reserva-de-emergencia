@@ -1,21 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>reserva-de-emergencia</title>
+    <title>Reserva de Emergência — calcule e acompanhe sua reserva</title>
+    <meta
+      name="description"
+      content="Descubra quanto guardar para sua reserva de emergência e acompanhe seu progresso mês a mês, de graça."
+    />
+    <link rel="canonical" href="https://reserva-de-emergencia.netlify.app/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Reserva de Emergência — calcule e acompanhe sua reserva" />
+    <meta
+      property="og:description"
+      content="Descubra quanto guardar para sua reserva de emergência e acompanhe seu progresso mês a mês, de graça."
+    />
+    <meta property="og:url" content="https://reserva-de-emergencia.netlify.app/" />
+    <meta name="twitter:card" content="summary" />
     <script>
       (function () {
         try {
-          var salvo = localStorage.getItem('tema');
-          var tema =
-            salvo === 'dark' || salvo === 'light'
-              ? salvo
+          var saved = localStorage.getItem('theme');
+          var theme =
+            saved === 'dark' || saved === 'light'
+              ? saved
               : matchMedia('(prefers-color-scheme: dark)').matches
                 ? 'dark'
                 : 'light';
-          document.documentElement.classList.add(tema + '-theme');
+          document.documentElement.classList.add(theme + '-theme');
         } catch (e) {
           document.documentElement.classList.add('light-theme');
         }

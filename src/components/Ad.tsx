@@ -13,23 +13,23 @@ interface Props {
   className?: string;
 }
 
-export function Anuncio({ slot, className }: Props) {
-  const preenchido = useRef(false);
+export function Ad({ slot, className }: Props) {
+  const filled = useRef(false);
 
   useEffect(() => {
-    if (preenchido.current) return;
-    preenchido.current = true;
+    if (filled.current) return;
+    filled.current = true;
 
     try {
       (window.adsbygoogle = window.adsbygoogle ?? []).push({});
     } catch {
-      // Bloqueador de anúncio ou script fora do ar: o app segue normal.
+      // Ad blocker or script unavailable: the app carries on normally.
     }
   }, []);
 
   return (
     <ins
-      className={`adsbygoogle anuncio ${className ?? ''}`}
+      className={`adsbygoogle ad ${className ?? ''}`}
       style={{ display: 'block' }}
       data-ad-client={AD_CLIENT}
       data-ad-slot={slot}
